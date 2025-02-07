@@ -1,13 +1,11 @@
 import pyfiglet
 import socket
 import ipaddress
-from colorama import Fore, Style, init
+from colorama import Fore, init
+from utils.utils import print_styled, save_report
 from utils.dict_ports import WELL_KNOWN_PORTS
 
 init()
-
-def print_styled(text, color=Fore.WHITE, style=Style.BRIGHT):
-    print(f"{style}{color}{text}{Style.RESET_ALL}")
 
 def get_os_info(banner):
     """Retorna informações sobre o sistema operacional"""
@@ -81,7 +79,8 @@ def scan_host(host, start_port, end_port, protocol="TCP", timeout=1.0):
             print_styled(f"Não foi possível resolver {host}", Fore.RED)
             return
 
-    print_styled(f"\n[+] Iniciando varredura em: {host} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}\n", Fore.CYAN)
+    report = f"[+] Iniciando varredura em: {host} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}\n\n"
+    print_styled(f"[+] Iniciando varredura em: {host} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}\n", Fore.CYAN)
     ports_to_scan = sorted(
         p for p in WELL_KNOWN_PORTS.keys() if start_port <= p <= end_port
     )
@@ -94,16 +93,28 @@ def scan_host(host, start_port, end_port, protocol="TCP", timeout=1.0):
         servico = WELL_KNOWN_PORTS.get(port, "Serviço desconhecido")
         if state == "aberta":
             if protocol.upper() == "TCP" and banner:
-                # print(banner)
                 os_info = get_os_info(banner)
+                line = f"[*] Porta {port}/{protocol.upper()} ABERTA - Serviço: {servico} | SO: {os_info}\n"
+                line += f"[?] BANNER: {banner.strip()}\n"
                 print_styled(f"[*] Porta {port}/{protocol.upper()} ABERTA - Serviço: {servico} | SO: {os_info}", Fore.GREEN)
+                print_styled(f"[?] BANNER: {banner.strip()}", Fore.BLUE)
             else:
+                line = f"[*] Porta {port}/{protocol.upper()} ABERTA - Serviço: {servico}\n"
                 print_styled(f"[*] Porta {port}/{protocol.upper()} ABERTA - Serviço: {servico}", Fore.GREEN)
         elif state == "filtrada":
+            line = f"[-] Porta {port}/{protocol.upper()} FILTRADA - Serviço: {servico}\n"
             print_styled(f"[-] Porta {port}/{protocol.upper()} FILTRADA - Serviço: {servico}", Fore.YELLOW)
         elif state == "fechada":
+            line = f"[X] Porta {port}/{protocol.upper()} FECHADA\n"
             print_styled(f"[X] Porta {port}/{protocol.upper()} FECHADA", Fore.RED)
-    print_styled("\n[+] Varredura finalizada.\n", Fore.MAGENTA)
+        report += line
+
+    report += "\n[+] Varredura finalizada.\n"
+    print_styled("[+] Varredura finalizada.", Fore.MAGENTA)
+
+    save_option = input("Deseja salvar o relatório? [S/N]: ")
+    if save_option.upper() == "S":
+        save_report(report, f"scan_{host}.txt")
 
 def scan_network(network_cidr, start_port, end_port, protocol="TCP", timeout=1.0):
     """
