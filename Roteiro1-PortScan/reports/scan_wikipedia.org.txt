@@ -1,0 +1,28 @@
+[+] Iniciando varredura em: wikipedia.org (Protocolo: TCP) - Portas: 1-10000
+
+[X] Porta 20/TCP FECHADA
+[X] Porta 21/TCP FECHADA
+[-] Porta 22/TCP FILTRADA - Serviço: SSH
+[X] Porta 23/TCP FECHADA
+[X] Porta 25/TCP FECHADA
+[X] Porta 53/TCP FECHADA
+[*] Porta 80/TCP ABERTA - Serviço: HTTP
+[X] Porta 110/TCP FECHADA
+[X] Porta 111/TCP FECHADA
+[-] Porta 135/TCP FILTRADA - Serviço: Microsoft RPC
+[-] Porta 139/TCP FILTRADA - Serviço: NetBIOS
+[X] Porta 143/TCP FECHADA
+[X] Porta 161/TCP FECHADA
+[*] Porta 443/TCP ABERTA - Serviço: HTTPS
+[-] Porta 445/TCP FILTRADA - Serviço: SMB
+[X] Porta 993/TCP FECHADA
+[X] Porta 995/TCP FECHADA
+[X] Porta 1433/TCP FECHADA
+[X] Porta 3000/TCP FECHADA
+[X] Porta 3306/TCP FECHADA
+[X] Porta 3389/TCP FECHADA
+[X] Porta 5432/TCP FECHADA
+[X] Porta 6379/TCP FECHADA
+[X] Porta 8080/TCP FECHADA
+
+[+] Varredura finalizada.
