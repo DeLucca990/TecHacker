@@ -3,7 +3,7 @@ import socket
 import ipaddress
 from colorama import Fore, init
 from utils.utils import print_styled, save_report
-from utils.dict_ports import WELL_KNOWN_PORTS
+from utils.dict_ports import WELL_KNOWN_PORTS, ALL_PORTS
 
 init()
 
@@ -16,8 +16,6 @@ def get_os_info(banner):
         return "Possivelmente Linux"
     elif "freebsd" in banner_lower:
         return "Possivelmente FreeBSD"
-    elif "mac" in banner_lower:
-        return "Possivelmente macOS"
     else:
         return "Não foi possível identificar o sistema operacional"
 
@@ -59,7 +57,7 @@ def udp_scan_port(address, port, family=socket.AF_INET, timeout=1.0):
             state = "fechada"
     return state, banner
 
-def scan_host(host, start_port, end_port, protocol="TCP", timeout=1.0):
+def scan_host(host, start_port, end_port, PORTS, protocol="TCP", timeout=1.0):
     """
     Varre (host, range de portas) no protocolo especificado (TCP ou UDP).
     Identifica estado da porta e tenta banner grabbing (no caso TCP).
@@ -82,7 +80,7 @@ def scan_host(host, start_port, end_port, protocol="TCP", timeout=1.0):
     report = f"[+] Iniciando varredura em: {host} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}\n\n"
     print_styled(f"[+] Iniciando varredura em: {host} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}\n", Fore.CYAN)
     ports_to_scan = sorted(
-        p for p in WELL_KNOWN_PORTS.keys() if start_port <= p <= end_port
+        p for p in PORTS.keys() if start_port <= p <= end_port
     )
     for port in ports_to_scan:
         if protocol.upper() == "UDP":
@@ -90,7 +88,7 @@ def scan_host(host, start_port, end_port, protocol="TCP", timeout=1.0):
         else:
             state, banner = tcp_scan_port(host, port, family=family, timeout=timeout)
 
-        servico = WELL_KNOWN_PORTS.get(port, "Serviço desconhecido")
+        servico = PORTS.get(port, "Serviço desconhecido")
         if state == "aberta":
             if protocol.upper() == "TCP" and banner:
                 os_info = get_os_info(banner)
@@ -116,7 +114,7 @@ def scan_host(host, start_port, end_port, protocol="TCP", timeout=1.0):
     if save_option.upper() == "S":
         save_report(report, f"scan_{host}.txt")
 
-def scan_network(network_cidr, start_port, end_port, protocol="TCP", timeout=1.0):
+def scan_network(network_cidr, start_port, end_port, PORTS, protocol="TCP", timeout=1.0):
     """
     Varre todas as hosts de uma rede (IPv4 ou IPv6) de acordo com o CIDR informado.
     """
@@ -126,9 +124,10 @@ def scan_network(network_cidr, start_port, end_port, protocol="TCP", timeout=1.0
         print(f"CIDR inválido: {network_cidr} - Erro: {e}")
         return
 
+    report = f"[+] Iniciando varredura na rede {network_cidr} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}\n\n"
     print(f"\nIniciando varredura na rede {network_cidr} (Protocolo: {protocol}) - Portas: {start_port}-{end_port}")
     ports_to_scan = sorted(
-        p for p in WELL_KNOWN_PORTS.keys() if start_port <= p <= end_port
+        p for p in PORTS.keys() if start_port <= p <= end_port
     )
     for ip in net_obj.hosts():
         ip_str = str(ip)
@@ -142,32 +141,53 @@ def scan_network(network_cidr, start_port, end_port, protocol="TCP", timeout=1.0
                                                family=socket.AF_INET6 if ip.version==6 else socket.AF_INET,
                                                timeout=timeout)
 
-            servico = WELL_KNOWN_PORTS.get(port, "Serviço desconhecido")
+            servico = PORTS.get(port, "Serviço desconhecido")
             if estado == "aberta":
                 if protocol.upper() == "TCP" and banner:
                     os_info = get_os_info(banner)
-                    print_styled(f"[*] {ip_str}:{port}/TCP ABERTA - {servico} | Banner: {banner.strip()} | SO: {os_info}", Fore.GREEN)
+                    line = f"[*] {ip_str}:{port}/TCP ABERTA - {servico} | Banner: {banner.strip()} | SO: {os_info}\n"
+                    line += f"[?] BANNER: {banner.strip()}\n"
+                    print_styled(f"[*] {ip_str}:{port}/TCP ABERTA - {servico} | SO: {os_info}", Fore.GREEN)
+                    print_styled(f"[?] BANNER: {banner.strip()}", Fore.BLUE)
                 else:
+                    line = f"[*] {ip_str}:{port}/{protocol.upper()} ABERTA - {servico}\n"
                     print_styled(f"[*] {ip_str}:{port}/{protocol.upper()} ABERTA - {servico}", Fore.GREEN)
             elif estado == "filtrada":
+                line = f"[-] {ip_str}:{port}/{protocol.upper()} FILTRADA - {servico}\n"
                 print_styled(f"[-] {ip_str}:{port}/{protocol.upper()} FILTRADA - {servico}", Fore.YELLOW)
             elif estado == "fechada":
+                line = f"[X] {ip_str}:{port}/{protocol.upper()} FECHADA\n"
                 print_styled(f"[X] {ip_str}:{port}/{protocol.upper()} FECHADA", Fore.RED)
+            report += line
+
+    report += "\n[+] Varredura finalizada.\n"
     print_styled("\n[+] Varredura finalizada.\n", Fore.MAGENTA)
+
+    save_option = input("Deseja salvar o relatório? [S/N]: ")
+    if save_option.upper() == "S":
+        save_report(report, f"scan_{network_cidr}.txt")
 
 def main():
     print(pyfiglet.figlet_format("PDL Port Scanner"))
     mode = input("Escolha o modo [1: Host único | 2: Rede]: ")
     protocol = input("Escolha o protocolo [TCP/UDP]: ")
+    ports = input("Escolha o range de portas [1: Well-Known | 2: Todas]: ")
+    if ports == "1":
+        PORTS = WELL_KNOWN_PORTS
+    elif ports == "2":
+        PORTS = ALL_PORTS
+    else:
+        print_styled("Opção inválida", Fore.RED)
+        return
     start_port = int(input("Porta inicial: "))
     end_port = int(input("Porta final: "))
 
     if mode == "1":
         host = input("Digite o host (IPv4 ou IPv6) (ex: 192.168.0.10 ou google.com): ")
-        scan_host(host, start_port, end_port, protocol=protocol)
+        scan_host(host, start_port, end_port, PORTS, protocol=protocol)
     elif mode == "2":
         network_cidr = input("Digite a rede em formato CIDR (ex: 192.168.0.0/24 ou 2001:db8::/64):")
-        scan_network(network_cidr, start_port, end_port, protocol=protocol)
+        scan_network(network_cidr, start_port, end_port, PORTS, protocol=protocol)
     else:
         print_styled("Modo inválido", Fore.RED)
 
