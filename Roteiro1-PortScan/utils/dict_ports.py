@@ -24,5 +24,6 @@ WELL_KNOWN_PORTS = {
     3389: "RDP",
     5432: "PostgreSQL",
     6379: "Redis",
+    8000: "HTTP-Alt",
     8080: "HTTP-Proxy"
 }
