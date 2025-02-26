@@ -172,6 +172,12 @@ def main():
     mode = input("Escolha o modo [1: Host único | 2: Rede]: ")
     protocol = input("Escolha o protocolo [TCP/UDP]: ")
     ports = input("Escolha o range de portas [1: Well-Known | 2: Todas]: ")
+    if mode not in ["1", "2"]:
+        print_styled("Modo inválido", Fore.RED)
+        return
+    if protocol.upper() not in ["TCP", "UDP"]:
+        print_styled("Protocolo inválido", Fore.RED)
+        return
     if ports == "1":
         PORTS = WELL_KNOWN_PORTS
     elif ports == "2":
