@@ -1,0 +1,1 @@
+# Repositório para os projetos da disciplina TecHacker
