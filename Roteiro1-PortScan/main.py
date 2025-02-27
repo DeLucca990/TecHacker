@@ -133,16 +133,16 @@ def scan_network(network_cidr, start_port, end_port, PORTS, protocol="TCP", time
         ip_str = str(ip)
         for port in ports_to_scan:
             if protocol.upper() == "UDP":
-                estado, banner = udp_scan_port(ip_str, port, 
+                state, banner = udp_scan_port(ip_str, port, 
                                                family=socket.AF_INET6 if ip.version==6 else socket.AF_INET,
                                                timeout=timeout)
             else:
-                estado, banner = tcp_scan_port(ip_str, port, 
+                state, banner = tcp_scan_port(ip_str, port, 
                                                family=socket.AF_INET6 if ip.version==6 else socket.AF_INET,
                                                timeout=timeout)
 
             servico = PORTS.get(port, "Serviço desconhecido")
-            if estado == "aberta":
+            if state == "aberta":
                 if protocol.upper() == "TCP" and banner:
                     os_info = get_os_info(banner)
                     line = f"[*] {ip_str}:{port}/TCP ABERTA - {servico} | Banner: {banner.strip()} | SO: {os_info}\n"
@@ -152,10 +152,10 @@ def scan_network(network_cidr, start_port, end_port, PORTS, protocol="TCP", time
                 else:
                     line = f"[*] {ip_str}:{port}/{protocol.upper()} ABERTA - {servico}\n"
                     print_styled(f"[*] {ip_str}:{port}/{protocol.upper()} ABERTA - {servico}", Fore.GREEN)
-            elif estado == "filtrada":
+            elif state == "filtrada":
                 line = f"[-] {ip_str}:{port}/{protocol.upper()} FILTRADA - {servico}\n"
                 print_styled(f"[-] {ip_str}:{port}/{protocol.upper()} FILTRADA - {servico}", Fore.YELLOW)
-            elif estado == "fechada":
+            elif state == "fechada":
                 line = f"[X] {ip_str}:{port}/{protocol.upper()} FECHADA\n"
                 print_styled(f"[X] {ip_str}:{port}/{protocol.upper()} FECHADA", Fore.RED)
             report += line
