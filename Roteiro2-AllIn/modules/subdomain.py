@@ -1,18 +1,6 @@
 import socket
 from colorama import Fore
-from utils.utils import print_styled, save_report
-
-def load_wordlist(file_path):
-    """Carrega uma wordlist de subdomínios a partir de um arquivo"""
-    try:
-        with open(file_path, 'r') as file:
-            return [line.strip() for line in file if line.strip()]
-    except FileNotFoundError:
-        print_styled(f"[!] Arquivo {file_path} não encontrado.", Fore.RED)
-        return []
-    except Exception as e:
-        print_styled(f"[!] Erro ao carregar a wordlist: {e}", Fore.RED)
-        return []
+from utils.utils import print_styled, save_report, load_wordlist
 
 def subdomain_scan(domain, wordlist=None):
     """Faz um scanner de subdomínios usando uma wordlist"""
