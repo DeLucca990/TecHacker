@@ -1,0 +1,7 @@
+[+] Tecnologia detectada para: http://avelinux.com.br
+
+- Servidor: cloudflare
+- WordPress
+- jQuery
+- Bootstrap CSS
+- Font Awesome
