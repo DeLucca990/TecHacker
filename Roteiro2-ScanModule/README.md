@@ -70,7 +70,7 @@ Roteiro2-ScanModule/
     ```
   
 ## Uso
-1. Execute o script principal:
+1. Dentro da pasta `Roteiro2-ScanModule` execute o script principal:
     ```bash
     python main.py
     # ou
