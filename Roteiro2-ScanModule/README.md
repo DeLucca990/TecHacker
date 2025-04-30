@@ -17,7 +17,7 @@ O PDL CLI Scanner é uma ferramenta de linha de comando desenvolvida em Python p
 
 ## Estrutura do Projeto
 ```
-Roteiro2-AllIn/
+Roteiro2-ScanModule/
 ├── modules/
 │   ├── portscan.py
 │   ├── whois_lookup.py
@@ -62,7 +62,7 @@ Roteiro2-AllIn/
       ```
 3. Navegue até o diretório do projeto:
     ```bash
-    cd TecHacker/Roteiro2-AllIn
+    cd TecHacker/Roteiro2-ScanModule
     ```
 4. Instale as dependências:
     ```bash
