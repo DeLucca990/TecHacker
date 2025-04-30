@@ -7,12 +7,12 @@ def subdomain_scan(domain, wordlist=None):
 
     wl_choice = input("Deseja usar a wordlist completa? (Esse processo pode demorar alguns miutos) [S/N]: ")
     if wl_choice.upper() == "S":
-        wordlist = load_wordlist("./worldlist/subdomains_large.txt")
+        wordlist = load_wordlist("./wordlist/subdomains_large.txt")
     elif wl_choice.upper() == "N":
-        wordlist = load_wordlist("./worldlist/subdomains_small.txt")
+        wordlist = load_wordlist("./wordlist/subdomains_small.txt")
     else:
         print_styled("Opção inválida. Usando wordlist pequena por padrão.", Fore.YELLOW)
-        wordlist = load_wordlist("./worldlist/subdomains_small.txt")
+        wordlist = load_wordlist("./wordlist/subdomains_small.txt")
 
     found_subdomains = []
     report = f"[+] Subdomain scan para {domain}\n\n"
