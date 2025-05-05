@@ -3,7 +3,7 @@ from colorama import Fore
 from utils.utils import print_styled, save_report
 
 def dns_enum_scan(domain):
-    """Realiza a enumeração básica de registros DNS"""
+    """Realiza a enumeração de registros DNS"""
     record_types = ['A', 'AAAA', 'MX', 'NS', 'CNAME', 'TXT']
     report = f"[+] Resultados de DNS Enumeration para: {domain}\n\n"
 

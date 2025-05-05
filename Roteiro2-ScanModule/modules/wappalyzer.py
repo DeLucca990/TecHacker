@@ -4,7 +4,7 @@ from colorama import Fore
 from utils.utils import print_styled, save_report
 
 def wappalyzer_like_scan(url):
-    """Análise avançada de tecnologias via regex no HTML, headers, scripts, links e metas"""
+    """Análise de tecnologias via regex no HTML, headers, scripts, links e metas dados"""
     tech_detected = []
     report = f"[+] Tecnologia detectada para: https://{url}\n\n"
 
